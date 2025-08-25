@@ -1,0 +1,95 @@
+# GitHub Copilot Ignore File
+# Excludes sensitive configuration files, build artifacts, and private data
+
+# Environment and Configuration Files
+.env
+.env.local
+.env.*.local
+*.env
+.env.*
+config.toml
+secrets.yml
+secrets.yaml
+
+# Build and Target Directories
+/target/
+target/
+**/target/
+/build/
+build/
+/dist/
+dist/
+
+# Logs and Debug Files
+*.log
+*.log.*
+logs/
+**/*.log
+debug.log
+error.log
+
+# Database Files (if local)
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Security and Authentication
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+private_key*
+public_key*
+jwt_secret*
+session_secret*
+
+# IDE and Editor Files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary Files
+*.tmp
+*.temp
+*~
+.#*
+\#*#
+
+# Backup Files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Coverage Reports
+coverage/
+*.coverage
+*.lcov
+
+# Documentation that might contain sensitive info
+CHANGELOG.md
+SECURITY.md
+deployment-notes.md
+infrastructure-notes.md
+
+# Custom application-specific excludes
+user_data/
+uploads/
+static/uploads/
+temp/
+cache/
+sessions/
