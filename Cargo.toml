@@ -16,7 +16,7 @@ name = "set_password"
 path = "src/bin/set_password.rs"
 
 [dependencies]
-axum = "0.7"
+axum = "0.8"
 tokio = { version = "1", features = ["full"] }
 tower = "0.4"
 tower-http = { version = "0.5", features = ["fs", "cors", "trace"] }
@@ -33,7 +33,7 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 argon2 = "0.5"
 tower-sessions = "0.13"
 tower-sessions-sqlx-store = { version = "0.14", features = ["postgres"] }
-axum-extra = { version = "0.9", features = ["form"] }
+axum-extra = { version = "0.10", features = ["form"] }
 
 [dev-dependencies]
 # Testing dependencies
