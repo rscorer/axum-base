@@ -1,0 +1,119 @@
+{
+  "models": [
+    {
+      "title": "GPT-4",
+      "provider": "openai",
+      "model": "gpt-4",
+      "contextLength": 8192,
+      "systemMessage": "You are an expert Rust developer working on an Axum-based web server template. Focus on production-ready, secure, and maintainable code using Rust 2024 edition idioms."
+    }
+  ],
+  "contextProviders": [
+    {
+      "name": "code",
+      "params": {}
+    },
+    {
+      "name": "docs",
+      "params": {}
+    },
+    {
+      "name": "diff",
+      "params": {}
+    },
+    {
+      "name": "terminal",
+      "params": {}
+    },
+    {
+      "name": "problems",
+      "params": {}
+    },
+    {
+      "name": "folder",
+      "params": {
+        "folders": ["src", "migrations", "tests", "templates"]
+      }
+    }
+  ],
+  "slashCommands": [
+    {
+      "name": "edit",
+      "description": "Edit selected code with AI assistance"
+    },
+    {
+      "name": "comment",
+      "description": "Add documentation comments to selected code"
+    },
+    {
+      "name": "share",
+      "description": "Export conversation to markdown"
+    },
+    {
+      "name": "cmd",
+      "description": "Generate terminal commands"
+    }
+  ],
+  "customCommands": [
+    {
+      "name": "axum-handler",
+      "prompt": "Generate an Axum route handler following the project's patterns:\n- Keep handlers lightweight, delegate business logic to services\n- Use proper error handling with Result types\n- Include input validation\n- Return appropriate HTTP status codes\n- Use the established AppContext and AppError types",
+      "description": "Generate Axum route handler"
+    },
+    {
+      "name": "sqlx-query",
+      "prompt": "Generate a SQLx database query following project conventions:\n- Use sqlx::query! or sqlx::query_as! macros for compile-time checking\n- Include proper error handling\n- Use PostgreSQL-specific features where appropriate\n- Follow the established database patterns",
+      "description": "Generate SQLx database query"
+    },
+    {
+      "name": "test-case",
+      "prompt": "Generate comprehensive tests for the selected code:\n- Unit tests for business logic in services\n- Integration tests for HTTP endpoints using axum-test\n- Test both success and error scenarios\n- Use appropriate mocking for external dependencies",
+      "description": "Generate test cases"
+    },
+    {
+      "name": "migration",
+      "prompt": "Generate a PostgreSQL migration file:\n- Follow sequential numbering (0001_, 0002_, etc.)\n- Include both UP and DOWN migrations if needed\n- Use appropriate PostgreSQL data types\n- Include proper constraints and indexes",
+      "description": "Generate database migration"
+    }
+  ],
+  "allowAnonymousTelemetry": false,
+  "embeddingsProvider": {
+    "provider": "transformers.js"
+  },
+  "systemMessage": "You are working on 'Axum Base', a production-ready Rust web server template built with:\n\n- Axum 0.7 web framework with Tokio async runtime\n- PostgreSQL database with SQLx for type-safe queries\n- tower-sessions for authentication with Argon2 password hashing\n- Tera templating engine for HTML responses\n- Comprehensive testing with axum-test and tokio-test\n- Rust 2024 edition\n\nKey architectural principles:\n- Modular design with clear separation of concerns\n- Type-safe database operations using SQLx compile-time checking\n- Secure authentication and session management\n- Comprehensive error handling with structured types\n- Production-ready security and performance considerations\n\nAlways follow the established patterns in the codebase and prioritize security, maintainability, and type safety.",
+  "tabAutocompleteModel": {
+    "title": "Starcoder",
+    "provider": "ollama",
+    "model": "starcoder:3b"
+  },
+  "rules": [
+    "Always use SQLx macros (sqlx::query!, sqlx::query_as!) instead of raw SQL strings",
+    "Keep route handlers lightweight - move business logic to services.rs", 
+    "Use Result<T, E> for error handling, avoid panicking in production code",
+    "Hash passwords with Argon2, never store plaintext passwords",
+    "Validate and sanitize all user input",
+    "Write comprehensive tests for both success and error scenarios",
+    "Use tower-sessions for session management",
+    "Follow Rust 2024 edition idioms and best practices",
+    "Implement proper logging without exposing sensitive information",
+    "Use structured error types that implement std::error::Error"
+  ],
+  "docs": [
+    {
+      "title": "Axum Documentation",
+      "startUrl": "https://docs.rs/axum/"
+    },
+    {
+      "title": "SQLx Documentation", 
+      "startUrl": "https://docs.rs/sqlx/"
+    },
+    {
+      "title": "Tokio Documentation",
+      "startUrl": "https://docs.rs/tokio/"
+    },
+    {
+      "title": "Tower Sessions Documentation",
+      "startUrl": "https://docs.rs/tower-sessions/"
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+# Cursor AI Rules - Axum Base Project
+
+## Project Context
+You are working on "axum-base", a production-ready Rust web server template built with Axum 0.7. This is a modular, secure foundation for building web applications with authentication, database integration, and comprehensive testing.
+
+## Core Technologies & Dependencies
+- **Rust Edition**: 2024
+- **Web Framework**: Axum 0.7 with Tokio async runtime
+- **Database**: PostgreSQL with SQLx (type-safe queries)
+- **Authentication**: tower-sessions with Argon2 password hashing
+- **Templating**: Tera template engine
+- **Testing**: axum-test, tokio-test, comprehensive unit and integration tests
+
+## Module Architecture
+The project follows a clear modular structure:
+```
+src/
+├── main.rs         # Entry point
+├── api.rs          # API handlers and JSON responses
+├── auth.rs         # Authentication middleware and utilities
+├── context.rs      # Application context and shared state
+├── database.rs     # Database connection and configuration
+├── models.rs       # Data models and database schemas
+├── routes.rs       # Route definitions and middleware setup
+├── server.rs       # Server initialization and configuration
+├── services.rs     # Business logic and service layer
+└── web.rs          # Web handlers for HTML responses
+```
+
+## Coding Standards & Conventions
+
+### Rust Best Practices
+- Follow Rust 2024 edition idioms and patterns
+- Use `async/await` consistently for all async operations
+- Prefer `Result<T, E>` error handling; avoid panicking in production code
+- Implement appropriate traits: `Debug`, `Clone`, `Serialize`/`Deserialize`
+- Use structured error types that implement `std::error::Error`
+- Write comprehensive documentation comments for public APIs
+
+### Database Operations
+- **ALWAYS** use SQLx with compile-time checked queries (`sqlx::query!`, `sqlx::query_as!`)
+- Place all migrations in the `migrations/` directory
+- Use database transactions for complex operations requiring atomicity
+- Never use raw string queries; prefer the SQLx macro system
+
+### Authentication & Security
+- All passwords MUST be hashed with Argon2
+- Use tower-sessions for session management with PostgreSQL backing store
+- Protect sensitive routes with authentication middleware
+- Always validate and sanitize user input
+- Never log sensitive information (passwords, session tokens, etc.)
+
+### Error Handling Patterns
+- Create meaningful error messages for end users
+- Log detailed errors for debugging without exposing internals
+- Use structured error types that provide context
+- Handle database errors gracefully with appropriate HTTP status codes
+
+### Code Organization Rules
+- Keep route handlers lightweight; move business logic to `services.rs`
+- Separate API handlers (`api.rs`) from web handlers (`web.rs`)
+- Use middleware for cross-cutting concerns (auth, logging, CORS)
+- Maintain clear separation between models, services, and handlers
+
+### Testing Requirements
+- Write unit tests for all business logic in services
+- Create integration tests in the `tests/` directory
+- Use `axum-test` for HTTP endpoint testing
+- Mock external dependencies appropriately
+- Test both success and failure scenarios
+
+## File Exclusions & Security
+Never suggest modifications to or include in context:
+- `.env` files (environment variables)
+- `/target/` directory (build artifacts)
+- `*.log` files (application logs)
+- Database credentials or connection strings
+- Session secrets or API keys
+- Any files matching patterns in `.gitignore`
+
+## Development Workflow
+- Environment configuration via `.env` file (see `.env.example` for template)
+- Database migrations run automatically in development
+- Use cargo-watch for hot reloading during development
+- Follow the Makefile commands for common development tasks
+
+## When Adding New Features
+1. **Models**: Define data structures in `models.rs`
+2. **Services**: Implement business logic in `services.rs`
+3. **Handlers**: Create route handlers in `api.rs` (JSON) or `web.rs` (HTML)
+4. **Routes**: Register new routes in `routes.rs`
+5. **Tests**: Write comprehensive tests for new functionality
+6. **Migrations**: Add database schema changes as new migration files
+
+## API Design Principles
+- Follow RESTful conventions for API endpoints
+- Use appropriate HTTP status codes (200, 201, 400, 401, 404, 500)
+- Return consistent JSON response formats
+- Implement proper error responses with meaningful messages
+- Version APIs appropriately if needed
+
+## Performance & Production Considerations
+- Use connection pooling for database operations
+- Implement proper logging with structured log formats
+- Handle graceful shutdowns
+- Use appropriate middleware for production (CORS, rate limiting if needed)
+- Consider caching strategies for frequently accessed data
+
+## Code Quality Standards
+- Format code with `rustfmt`
+- Pass all `clippy` lints without warnings
+- Maintain high test coverage
+- Write clear, descriptive commit messages
+- Document complex business logic thoroughly

@@ -1,0 +1,114 @@
+# Aider AI Configuration for Axum Base
+# Optimizes Aider for pair programming with this Rust web server template
+
+# Model Configuration
+model: gpt-4o
+
+# File exclusions - don't include these in context or suggest edits
+gitignore: true
+
+# Additional files to ignore beyond .gitignore
+ignore:
+  - ".env*"
+  - "target/"
+  - "*.log"
+  - "Cargo.lock"  # Generated file, should not be edited
+  - ".DS_Store"
+  - "*.tmp"
+  - "*.bak"
+  - "coverage/"
+  - "sessions/"
+  
+# Read-only files - can read for context but never modify
+read_only:
+  - ".env.example"
+  - "README.md"
+  - "LICENSE"
+
+# Language and framework context
+language: rust
+frameworks:
+  - axum
+  - sqlx
+  - tokio
+  - tera
+
+# Code quality and safety rules
+lint: true
+test: true
+format: true
+
+# Custom instructions for Aider when working with this codebase
+instructions: |
+  You are working on "axum-base", a production-ready Rust web server template. 
+  
+  ARCHITECTURE GUIDELINES:
+  - This is a modular Axum 0.7 web server with PostgreSQL and authentication
+  - Follow the established module structure: api.rs (JSON), web.rs (HTML), services.rs (business logic)
+  - Keep handlers lightweight, move complex logic to services
+  - Use SQLx compile-time checked queries only, never raw SQL strings
+  
+  SAFETY & SECURITY:
+  - Never expose or log sensitive data (passwords, tokens, connection strings)
+  - Always hash passwords with Argon2
+  - Use tower-sessions for session management
+  - Validate and sanitize all user input
+  
+  TESTING STRATEGY:
+  - Write unit tests for business logic in services
+  - Use axum-test for integration tests
+  - Test both success and error cases
+  - Mock external dependencies appropriately
+  
+  DATABASE PRACTICES:
+  - All database operations must use SQLx macros (sqlx::query!, sqlx::query_as!)
+  - Use transactions for complex operations
+  - Migrations go in migrations/ directory
+  - Follow PostgreSQL best practices
+  
+  CODE QUALITY:
+  - Use Rust 2024 edition features and idioms
+  - Prefer Result<T, E> error handling over panicking
+  - Implement proper error types that implement std::error::Error
+  - Use async/await consistently
+  - Run rustfmt and clippy before suggesting changes
+  
+  PERFORMANCE:
+  - Use connection pooling for database operations
+  - Consider caching for frequently accessed data
+  - Implement proper logging with structured formats
+  - Handle graceful shutdowns
+
+# Map file patterns to their purposes for better context understanding
+file_types:
+  "src/api.rs": "JSON API route handlers and responses"
+  "src/auth.rs": "Authentication middleware and utilities"
+  "src/context.rs": "Application context and shared state"
+  "src/database.rs": "Database connection and configuration"
+  "src/models.rs": "Data models and database schemas"  
+  "src/routes.rs": "Route definitions and middleware setup"
+  "src/server.rs": "Server initialization and configuration"
+  "src/services.rs": "Business logic and service layer"
+  "src/web.rs": "HTML web handlers and template responses"
+  "src/main.rs": "Application entry point"
+  "migrations/*.sql": "Database schema migrations"
+  "tests/*.rs": "Integration and unit tests"
+  "templates/*.html": "Tera HTML templates"
+
+# Auto-commit settings
+auto_commits: true
+commit_prompt: |
+  Write a clear, concise commit message in the format:
+  <type>(<scope>): <description>
+  
+  Where type is one of: feat, fix, docs, style, refactor, test, chore
+  And scope is the module/area affected (api, auth, db, etc.)
+
+# Enable helpful features
+pretty: true
+show_diffs: true
+stream: true
+watch: false  # Don't auto-reload files (can interfere with cargo)
+
+# Voice settings (if using voice mode)
+voice_language: en
