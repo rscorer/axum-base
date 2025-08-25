@@ -32,7 +32,7 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 # Authentication dependencies
 argon2 = "0.5"
 tower-sessions = "0.13"
-tower-sessions-sqlx-store = { version = "0.14", features = ["postgres"] }
+tower-sessions-sqlx-store = { version = "0.15", features = ["postgres"] }
 axum-extra = { version = "0.10", features = ["form"] }
 
 [dev-dependencies]
