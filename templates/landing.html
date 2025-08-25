@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Landing{% endblock %}
+
+{% block content %}
+<!-- Landing Page Content -->
+<div class="bg-white py-24 sm:py-32 dark:bg-gray-900">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl lg:mx-0">
+            <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl dark:text-white">
+                {{ page_title | default(value="Stay on top of customer support") }}
+            </h2>
+            <p class="mt-6 text-lg/8 text-gray-600 dark:text-gray-300">
+                {{ page_description | default(value="Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum cupiditate veritatis in accusamus quisquam.") }}
+            </p>
+        </div>
+        
+        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+            <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+                <!-- Features are provided by the Rust handler -->
+                {% for feature in landing_features %}
+                <div class="flex flex-col">
+                    <dt class="text-base/7 font-semibold text-gray-900 dark:text-white">
+                        <div class="mb-6 flex size-10 items-center justify-center rounded-lg bg-indigo-600 dark:bg-indigo-500">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" data-slot="icon" aria-hidden="true" class="size-6 text-white">
+                                <path d="{{ feature.icon_path }}" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        {{ feature.title }}
+                    </dt>
+                    <dd class="mt-1 flex flex-auto flex-col text-base/7 text-gray-600 dark:text-gray-400">
+                        <p class="flex-auto">{{ feature.description }}</p>
+                        <p class="mt-6">
+                            <a href="{{ feature.link | default(value='#') }}" class="text-sm/6 font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                Learn more <span aria-hidden="true">→</span>
+                            </a>
+                        </p>
+                    </dd>
+                </div>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+<!-- Custom styles for index page -->
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .feature-card {
+        transition: transform 0.2s ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block nav %}
+<!-- Use the default navigation from base template -->
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-5xl font-bold mb-4">
+            🚀 {{ service_name }}
+        </h1>
+        <p class="text-xl mb-8 text-blue-100">
+            {{ description }}
+        </p>
+        <div class="text-2xl font-semibold">
+            {% if current_user %}
+                Welcome back, {{ current_user.username }}!
+            {% else %}
+                Build amazing things with Rust!
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for feature in features %}
+            <div class="feature-card bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center border border-gray-200 dark:border-gray-700">
+                <div class="text-4xl mb-4">{{ feature.icon }}</div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    {{ feature.title }}
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    {{ feature.description }}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+            Try Our APIs
+        </h2>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% for endpoint in endpoints %}
+            <a href="{{ endpoint.path }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                {{ endpoint.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add some enhanced interactivity for feature cards
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-5px)';
+            card.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = '';
+        });
+    });
+</script>
+{% endblock %}
