@@ -1,16 +1,16 @@
 # 🚀 Axum Base - Production-Ready Rust Web Server Template
 
-A modern, secure, and scalable Rust web server template built with **Axum 0.7**, featuring authentication, database integration, templating, and comprehensive AI coding assistant support.
+A modern, secure, and scalable Rust web server template built with **Axum 0.8**, featuring authentication, database integration, templating, and comprehensive AI coding assistant support.
 
 [![Rust](https://img.shields.io/badge/rust-2024%20edition-orange.svg)](https://www.rust-lang.org)
-[![Axum](https://img.shields.io/badge/axum-0.7-blue.svg)](https://github.com/tokio-rs/axum)
+[![Axum](https://img.shields.io/badge/axum-0.8-blue.svg)](https://github.com/tokio-rs/axum)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-supported-blue.svg)](https://www.postgresql.org)
 [![SQLx](https://img.shields.io/badge/sqlx-compile%20time%20checked-green.svg)](https://github.com/launchbadge/sqlx)
 
 ## ✨ Features
 
 ### 🏗️ **Modern Architecture**
-- **Axum 0.7** - High-performance async web framework
+- **Axum 0.8** - High-performance async web framework
 - **Tokio** - Robust async runtime with full feature set
 - **Modular Design** - Clean separation of concerns across dedicated modules
 - **Rust 2024 Edition** - Latest language features and improvements
@@ -61,6 +61,7 @@ This project includes comprehensive configuration for **10+ AI coding tools**:
 ### Prerequisites
 - **Rust** (latest stable) - [Install Rust](https://rustup.rs/)
 - **PostgreSQL** - [Install PostgreSQL](https://www.postgresql.org/download/)
+- **Tailwind CSS CLI** - [Install Tailwind CSS](https://tailwindcss.com/blog/standalone-cli)
 - **Git** - [Install Git](https://git-scm.com/)
 
 ### 1. Clone & Setup
@@ -81,18 +82,27 @@ cp .env.example .env
 # DATABASE_URL=postgres://username:password@localhost:5432/axum_base_dev
 ```
 
-### 3. Install Dependencies & Run
+### 3. Build Tailwind CSS & Install Dependencies
 ```bash
 # Install dependencies
 cargo build
 
+# Build Tailwind CSS for development (run in separate terminal)
+./tw.sh
+
+# OR build Tailwind CSS once for production
+./tw-build.sh
+```
+
+### 4. Run Application
+```bash
 # Run database migrations (automatic on first run)
 cargo run
 
 # Server starts on http://localhost:3093
 ```
 
-### 4. Create Test User (Optional)
+### 5. Create Test User (Optional)
 ```bash
 # Create a user via CLI
 cargo run --bin create_user
@@ -133,6 +143,15 @@ templates/           # 🎨 Tera HTML templates
 └── ...
 
 static/              # 📦 Static assets (CSS, JS, images)
+├── style.css        #   Generated CSS from Tailwind (served to browsers)
+
+input.css            # 🎨 Tailwind CSS source (@import "tailwindcss")
+tw.sh                # ⚡ Development Tailwind build (--watch)
+tw-build.sh          # 🚀 Production Tailwind build (--minify)
+
+Dockerfile           # 🐳 Multi-stage Docker build configuration
+.dockerignore        # 🚫 Docker build context exclusions
+compose.yml          # 📋 Docker Compose orchestration
 ```
 
 ## 🛠️ Development Commands
@@ -140,6 +159,16 @@ static/              # 📦 Static assets (CSS, JS, images)
 ```bash
 # Development server with auto-reload
 cargo watch -x run
+
+# Tailwind CSS development (watch mode) - run in separate terminal
+./tw.sh
+# OR use Makefile
+make tailwind-dev
+
+# Tailwind CSS production build
+./tw-build.sh
+# OR use Makefile
+make tailwind-build
 
 # Run all tests
 cargo test
@@ -160,6 +189,47 @@ cargo sqlx prepare
 cargo run --bin create_user
 cargo run --bin set_password
 ```
+
+## 🎨 Tailwind CSS Integration
+
+This project uses **Tailwind CSS** for styling, with a streamlined build process using the Tailwind standalone CLI.
+
+### 🏗️ Architecture
+- **Input**: `input.css` (imports Tailwind directives)
+- **Output**: `static/style.css` (served to browsers)
+- **Template Integration**: Referenced in `templates/base.html`
+
+### ⚡ Development Workflow
+```bash
+# Start Tailwind in watch mode (monitors file changes)
+./tw.sh
+
+# In a separate terminal, start your Axum server
+cargo run
+```
+
+### 🚀 Production Build
+```bash
+# One-time build with minification for production
+./tw-build.sh
+
+# OR use Makefile
+make tailwind-build
+```
+
+### 📁 File Structure
+```
+input.css          # Tailwind source (imports @tailwindcss)
+static/style.css   # Generated CSS (served by Axum)
+tw.sh             # Development script (--watch)
+tw-build.sh       # Production script (--minify)
+```
+
+### 💡 Usage Tips
+- Run `./tw.sh` in a **separate terminal** for development
+- The build process **automatically detects** class usage in templates
+- Production builds are **minified** for optimal performance
+- All Tailwind classes in templates are **purged** if unused
 
 ## 🔧 Configuration
 
@@ -224,24 +294,61 @@ Uses real PostgreSQL with proper setup/teardown for reliable testing.
 ## 🚀 Deployment
 
 ### Docker (Recommended)
-```dockerfile
-FROM rust:1.80 as builder
-WORKDIR /app
-COPY . .
-RUN cargo build --release
 
-FROM debian:bookworm-slim
-WORKDIR /app
-COPY --from=builder /app/target/release/axum-base .
-EXPOSE 3093
-CMD ["./axum-base"]
+The project includes a comprehensive multi-stage Dockerfile that:
+- ✅ Builds Rust application with optimized dependencies caching
+- ✅ Builds Tailwind CSS with minification for production
+- ✅ Creates secure runtime image with non-root user
+- ✅ Includes health checks and proper signal handling
+
+#### Quick Start with Docker Compose
+```bash
+# Build and start all services (app + PostgreSQL)
+docker compose up --build
+
+# Run in background
+docker compose up -d --build
+
+# View logs
+docker compose logs -f app
+
+# Stop services
+docker compose down
+```
+
+#### Build Docker Image
+```bash
+# Build the image
+docker build -t axum-base .
+
+# Run with external database
+docker run -p 3093:3093 \
+  -e DATABASE_URL=postgres://user:pass@host:5432/db \
+  -e SESSION_SECRET=your-secret-key \
+  axum-base
 ```
 
 ### Production Environment
+
+#### Environment Variables
 ```bash
-# Set production environment
-export RUST_LOG=info
+# Required
 export DATABASE_URL=postgres://prod_user:prod_pass@db:5432/axum_base
+export SESSION_SECRET=your-production-secret-key
+
+# Optional
+export RUST_LOG=info
+export PORT=3093
+export HOST=0.0.0.0
+```
+
+#### Manual Deployment
+```bash
+# Build Tailwind CSS for production
+./tw-build.sh
+
+# Build Rust application
+cargo build --release
 
 # Run migrations
 sqlx migrate run
