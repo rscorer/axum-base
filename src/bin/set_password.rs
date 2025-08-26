@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
 
     let args: Vec<String> = env::args().collect();
-    
+
     if args.len() != 3 {
         eprintln!("Usage: {} <user_id> <password>", args[0]);
         std::process::exit(1);

@@ -2,7 +2,7 @@
 //!
 //! Shared data structures used across the application.
 
-use chrono::{DateTime, Utc, Timelike};
+use chrono::{DateTime, Timelike, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use time::OffsetDateTime;
@@ -22,9 +22,9 @@ pub fn time_to_chrono(dt: OffsetDateTime) -> DateTime<Utc> {
 #[allow(dead_code)]
 pub fn chrono_to_time(dt: DateTime<Utc>) -> OffsetDateTime {
     OffsetDateTime::from_unix_timestamp(dt.timestamp())
-        .unwrap_or_else(|_| OffsetDateTime::UNIX_EPOCH)
+        .unwrap_or(OffsetDateTime::UNIX_EPOCH)
         .replace_nanosecond(dt.nanosecond())
-        .unwrap_or_else(|_| OffsetDateTime::UNIX_EPOCH)
+        .unwrap_or(OffsetDateTime::UNIX_EPOCH)
 }
 
 /// Convert Option<time::OffsetDateTime> to Option<chrono::DateTime<Utc>>
@@ -208,7 +208,7 @@ impl From<User> for AuthenticatedUser {
 mod tests {
     use super::*;
     use chrono::{DateTime, Utc};
-    
+
     #[test]
     fn test_user_to_user_response_conversion() {
         let user = User {
@@ -222,9 +222,9 @@ mod tests {
             created_at: DateTime::from_timestamp(1640995200, 0).unwrap(), // 2022-01-01
             updated_at: DateTime::from_timestamp(1640995200, 0).unwrap(),
         };
-        
+
         let user_response: UserResponse = user.into();
-        
+
         assert_eq!(user_response.id, 1);
         assert_eq!(user_response.username, "testuser");
         assert_eq!(user_response.email, "test@example.com");
@@ -232,35 +232,35 @@ mod tests {
         assert_eq!(user_response.is_active, true);
         // Verify that sensitive data (password_hash) is not included in UserResponse
     }
-    
+
     #[test]
     fn test_time_conversion_functions() {
         let chrono_dt = DateTime::from_timestamp(1640995200, 123456789).unwrap();
         let time_dt = chrono_to_time(chrono_dt);
         let back_to_chrono = time_to_chrono(time_dt);
-        
+
         // Should be approximately equal (nanoseconds may differ slightly due to conversion)
         assert_eq!(chrono_dt.timestamp(), back_to_chrono.timestamp());
     }
-    
+
     #[test]
     fn test_optional_time_conversions() {
         let some_chrono = Some(DateTime::from_timestamp(1640995200, 0).unwrap());
         let none_chrono: Option<DateTime<Utc>> = None;
-        
+
         let some_time = chrono_opt_to_time_opt(some_chrono);
         let none_time = chrono_opt_to_time_opt(none_chrono);
-        
+
         assert!(some_time.is_some());
         assert!(none_time.is_none());
-        
+
         let back_to_some_chrono = time_opt_to_chrono_opt(some_time);
         let back_to_none_chrono = time_opt_to_chrono_opt(none_time);
-        
+
         assert!(back_to_some_chrono.is_some());
         assert!(back_to_none_chrono.is_none());
     }
-    
+
     #[test]
     fn test_api_response_serialization() {
         let response = ApiResponse {
@@ -268,24 +268,24 @@ mod tests {
             status: "success".to_string(),
             timestamp: "2022-01-01T00:00:00Z".to_string(),
         };
-        
+
         let json = serde_json::to_string(&response).expect("Should serialize");
         let deserialized: ApiResponse = serde_json::from_str(&json).expect("Should deserialize");
-        
+
         assert_eq!(deserialized.message, "Test message");
         assert_eq!(deserialized.status, "success");
         assert_eq!(deserialized.timestamp, "2022-01-01T00:00:00Z");
     }
-    
+
     #[test]
     fn test_login_request_deserialization() {
         let json = r#"{
             "username": "testuser",
             "password": "testpass"
         }"#;
-        
+
         let login_req: LoginRequest = serde_json::from_str(json).expect("Should deserialize");
-        
+
         assert_eq!(login_req.username, "testuser");
         assert_eq!(login_req.password, "testpass");
     }

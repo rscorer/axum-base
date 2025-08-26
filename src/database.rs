@@ -12,11 +12,14 @@ pub async fn init_pool() -> Result<PgPool, sqlx::Error> {
 }
 
 /// Initialize the database connection pool with optional URL override
-pub async fn init_pool_with_url(database_url_override: Option<&str>) -> Result<PgPool, sqlx::Error> {
+pub async fn init_pool_with_url(
+    database_url_override: Option<&str>,
+) -> Result<PgPool, sqlx::Error> {
     let database_url = match database_url_override {
         Some(url) => url.to_string(),
-        None => env::var("DATABASE_URL")
-            .expect("DATABASE_URL must be set in environment or .env file")
+        None => {
+            env::var("DATABASE_URL").expect("DATABASE_URL must be set in environment or .env file")
+        }
     };
 
     println!("🗄️  Connecting to PostgreSQL database...");
@@ -37,21 +40,17 @@ pub async fn init_pool_with_url(database_url_override: Option<&str>) -> Result<P
 /// Run database migrations
 pub async fn run_migrations(pool: &PgPool) -> Result<(), sqlx::migrate::MigrateError> {
     println!("🔄 Running database migrations...");
-    
-    sqlx::migrate!("./migrations")
-        .run(pool)
-        .await?;
-    
+
+    sqlx::migrate!("./migrations").run(pool).await?;
+
     println!("✅ Database migrations completed");
     Ok(())
 }
 
 /// Test database connectivity
 pub async fn test_connection(pool: &PgPool) -> Result<bool, sqlx::Error> {
-    let row = sqlx::query("SELECT 1 as test")
-        .fetch_one(pool)
-        .await?;
-    
+    let row = sqlx::query("SELECT 1 as test").fetch_one(pool).await?;
+
     let test_value: i32 = row.get("test");
     Ok(test_value == 1)
 }
@@ -63,7 +62,7 @@ pub async fn get_connection_info(pool: &PgPool) -> Result<DatabaseInfo, sqlx::Er
             version() as version,
             current_database() as database_name,
             current_user as username,
-            NOW() as server_time"
+            NOW() as server_time",
     )
     .fetch_one(pool)
     .await?;

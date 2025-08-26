@@ -2,13 +2,13 @@
 //!
 //! Service layer for handling business logic and database operations.
 
-use sqlx::PgPool;
+use argon2::password_hash::{SaltString, rand_core::OsRng};
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
-use argon2::password_hash::{rand_core::OsRng, SaltString};
+use sqlx::PgPool;
 
 use crate::models::{
-    User, Category, Item, CreateUserRequest, UserResponse, CreateItemRequest, ItemWithCategory,
-    time_to_chrono, time_opt_to_chrono_opt
+    Category, CreateItemRequest, CreateUserRequest, Item, ItemWithCategory, User, UserResponse,
+    time_opt_to_chrono_opt, time_to_chrono,
 };
 
 // =============================================================================
@@ -50,7 +50,10 @@ impl UserService {
     }
 
     /// Get user by username
-    pub async fn get_user_by_username(pool: &PgPool, username: &str) -> Result<Option<User>, sqlx::Error> {
+    pub async fn get_user_by_username(
+        pool: &PgPool,
+        username: &str,
+    ) -> Result<Option<User>, sqlx::Error> {
         let row = sqlx::query!(
             "SELECT id, username, email, password_hash, email_verified, is_active, last_login, created_at, updated_at 
              FROM users 
@@ -79,9 +82,14 @@ impl UserService {
     }
 
     /// Verify user password
-    pub async fn verify_password(password: &str, hash: &str) -> Result<bool, argon2::password_hash::Error> {
+    pub async fn verify_password(
+        password: &str,
+        hash: &str,
+    ) -> Result<bool, argon2::password_hash::Error> {
         let parsed_hash = PasswordHash::new(hash)?;
-        Ok(Argon2::default().verify_password(password.as_bytes(), &parsed_hash).is_ok())
+        Ok(Argon2::default()
+            .verify_password(password.as_bytes(), &parsed_hash)
+            .is_ok())
     }
 
     /// Hash password
@@ -94,18 +102,19 @@ impl UserService {
 
     /// Update user's last login time
     pub async fn update_last_login(pool: &PgPool, user_id: i32) -> Result<(), sqlx::Error> {
-        sqlx::query!(
-            "UPDATE users SET last_login = NOW() WHERE id = $1",
-            user_id
-        )
-        .execute(pool)
-        .await?;
-        
+        sqlx::query!("UPDATE users SET last_login = NOW() WHERE id = $1", user_id)
+            .execute(pool)
+            .await?;
+
         Ok(())
     }
 
     /// Update user's email
-    pub async fn update_user_email(pool: &PgPool, user_id: i32, new_email: &str) -> Result<(), sqlx::Error> {
+    pub async fn update_user_email(
+        pool: &PgPool,
+        user_id: i32,
+        new_email: &str,
+    ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "UPDATE users SET email = $1, updated_at = NOW() WHERE id = $2",
             new_email,
@@ -113,12 +122,16 @@ impl UserService {
         )
         .execute(pool)
         .await?;
-        
+
         Ok(())
     }
 
     /// Update user's password
-    pub async fn update_user_password(pool: &PgPool, user_id: i32, new_password_hash: &str) -> Result<(), sqlx::Error> {
+    pub async fn update_user_password(
+        pool: &PgPool,
+        user_id: i32,
+        new_password_hash: &str,
+    ) -> Result<(), sqlx::Error> {
         sqlx::query!(
             "UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2",
             new_password_hash,
@@ -126,13 +139,17 @@ impl UserService {
         )
         .execute(pool)
         .await?;
-        
+
         Ok(())
     }
 
     /// Create new user
-    pub async fn create_user(pool: &PgPool, request: &CreateUserRequest) -> Result<UserResponse, sqlx::Error> {
-        let password_hash = Self::hash_password(&request.password).await
+    pub async fn create_user(
+        pool: &PgPool,
+        request: &CreateUserRequest,
+    ) -> Result<UserResponse, sqlx::Error> {
+        let password_hash = Self::hash_password(&request.password)
+            .await
             .map_err(|e| sqlx::Error::Protocol(format!("Password hashing failed: {}", e)))?;
 
         let row = sqlx::query!(
@@ -182,21 +199,27 @@ impl CategoryService {
         .fetch_all(pool)
         .await?;
 
-        let categories: Vec<Category> = rows.into_iter().map(|row| Category {
-            id: row.id,
-            category_name: row.category_name,
-            display_name: row.display_name,
-            is_visible: row.is_visible,
-            display_order: row.display_order,
-            created_at: time_to_chrono(row.created_at),
-            updated_at: time_to_chrono(row.updated_at),
-        }).collect();
+        let categories: Vec<Category> = rows
+            .into_iter()
+            .map(|row| Category {
+                id: row.id,
+                category_name: row.category_name,
+                display_name: row.display_name,
+                is_visible: row.is_visible,
+                display_order: row.display_order,
+                created_at: time_to_chrono(row.created_at),
+                updated_at: time_to_chrono(row.updated_at),
+            })
+            .collect();
 
         Ok(categories)
     }
 
     /// Get category by ID
-    pub async fn get_category_by_id(pool: &PgPool, category_id: i32) -> Result<Option<Category>, sqlx::Error> {
+    pub async fn get_category_by_id(
+        pool: &PgPool,
+        category_id: i32,
+    ) -> Result<Option<Category>, sqlx::Error> {
         let row = sqlx::query!(
             "SELECT id, category_name, display_name, is_visible, display_order, created_at, updated_at 
              FROM category 
@@ -277,7 +300,10 @@ impl ItemService {
     }
 
     /// Get items by category
-    pub async fn get_items_by_category(pool: &PgPool, category_id: i32) -> Result<Vec<Item>, sqlx::Error> {
+    pub async fn get_items_by_category(
+        pool: &PgPool,
+        category_id: i32,
+    ) -> Result<Vec<Item>, sqlx::Error> {
         let rows = sqlx::query!(
             "SELECT id, title, description, data, is_active, category_id, created_at, updated_at
              FROM items 
@@ -288,22 +314,28 @@ impl ItemService {
         .fetch_all(pool)
         .await?;
 
-        let items: Vec<Item> = rows.into_iter().map(|row| Item {
-            id: row.id,
-            title: row.title,
-            description: row.description,
-            data: row.data,
-            is_active: row.is_active,
-            category_id: row.category_id,
-            created_at: time_to_chrono(row.created_at),
-            updated_at: time_to_chrono(row.updated_at),
-        }).collect();
+        let items: Vec<Item> = rows
+            .into_iter()
+            .map(|row| Item {
+                id: row.id,
+                title: row.title,
+                description: row.description,
+                data: row.data,
+                is_active: row.is_active,
+                category_id: row.category_id,
+                created_at: time_to_chrono(row.created_at),
+                updated_at: time_to_chrono(row.updated_at),
+            })
+            .collect();
 
         Ok(items)
     }
 
     /// Create new item
-    pub async fn create_item(pool: &PgPool, request: &CreateItemRequest) -> Result<Item, sqlx::Error> {
+    pub async fn create_item(
+        pool: &PgPool,
+        request: &CreateItemRequest,
+    ) -> Result<Item, sqlx::Error> {
         let row = sqlx::query!(
             "INSERT INTO items (title, description, data, category_id) 
              VALUES ($1, $2, $3, $4) 

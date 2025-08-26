@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
 
     let args: Vec<String> = env::args().collect();
-    
+
     if args.len() != 2 && args.len() != 4 {
         eprintln!("Usage: {} <username> [email] [password]", args[0]);
         eprintln!("       {} <username>  # Interactive mode", args[0]);
@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let username = &args[1];
-    
+
     let (email, password) = if args.len() == 4 {
         // Non-interactive mode
         (args[2].clone(), Some(args[3].clone()))
@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         io::stdout().flush()?;
         let mut set_password = String::new();
         io::stdin().read_line(&mut set_password)?;
-        
+
         let password = if set_password.trim().to_lowercase() == "y" {
             print!("Password: ");
             io::stdout().flush()?;
@@ -68,7 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("   Username: {}", user.username);
             println!("   Email: {}", user.email);
             println!("   Active: {}", user.is_active);
-            
+
             if password.is_some() {
                 println!("   Password: Set");
             } else {

@@ -13,7 +13,10 @@ use tower_sessions::{Expiry, SessionManagerLayer};
 use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::api::{api_hello, health_check};
-use crate::web::{handler_404, serve_index, serve_landing, serve_login, handle_login, handle_logout, serve_profile, handle_profile_update};
+use crate::web::{
+    handle_login, handle_logout, handle_profile_update, handler_404, serve_index, serve_landing,
+    serve_login, serve_profile,
+};
 
 /// Creates the main application router with all routes and middleware
 pub async fn create_router(pool: PgPool) -> Router {
@@ -26,7 +29,9 @@ pub async fn create_router(pool: PgPool) -> Router {
 
     let session_layer = SessionManagerLayer::new(session_store)
         .with_secure(false) // Set to true in production with HTTPS
-        .with_expiry(Expiry::OnInactivity(tower_sessions::cookie::time::Duration::days(30))); // 30 days
+        .with_expiry(Expiry::OnInactivity(
+            tower_sessions::cookie::time::Duration::days(30),
+        )); // 30 days
 
     Router::new()
         // Root route serves the welcome page
