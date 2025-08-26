@@ -7,7 +7,7 @@ use sqlx::PgPool;
 use std::env;
 
 use crate::database::get_connection_info;
-use crate::models::{ApiResponse, HealthResponse, DatabaseHealthInfo};
+use crate::models::{ApiResponse, DatabaseHealthInfo, HealthResponse};
 
 /// Health check endpoint with database connectivity check
 pub async fn health_check(State(pool): State<PgPool>) -> Json<HealthResponse> {

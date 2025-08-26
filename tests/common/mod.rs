@@ -1,7 +1,7 @@
+use axum::Router;
+use axum_base::{auth::PasswordService, database, models::User};
 use sqlx::PgPool;
 use std::sync::Once;
-use axum::Router;
-use axum_base::{database, models::User, auth::PasswordService};
 
 static INIT: Once = Once::new();
 
@@ -40,11 +40,11 @@ impl TestDatabase {
         // Clean tables in reverse dependency order
         let tables = [
             "trip_cards",
-            "travelers", 
+            "travelers",
             "dog_sitters",
             "sessions",
             "users",
-            "categories"
+            "categories",
         ];
 
         for table in &tables {
@@ -55,12 +55,12 @@ impl TestDatabase {
                     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{}') THEN 
                         TRUNCATE TABLE {} RESTART IDENTITY CASCADE; 
                     END IF; 
-                END $$;", 
+                END $$;",
                 table, table
             ))
             .execute(&self.pool)
             .await;
-            
+
             if let Err(e) = result {
                 eprintln!("Warning: Failed to clean table {}: {}", table, e);
             }
@@ -69,8 +69,8 @@ impl TestDatabase {
 
     /// Create a test user and return the User struct
     pub async fn create_test_user(&self, username: &str, email: &str, password: &str) -> User {
-        let password_hash = PasswordService::hash_password(password)
-            .expect("Failed to hash password");
+        let password_hash =
+            PasswordService::hash_password(password).expect("Failed to hash password");
 
         // Use a regular query to avoid type conversion issues
         sqlx::query_as::<_, User>(
@@ -86,18 +86,14 @@ impl TestDatabase {
         .await
         .expect("Failed to create test user")
     }
-    
 
     /// Create a testable Axum app instance with test database  
     /// This creates a test router with only API endpoints to avoid template issues
     pub async fn create_test_app(&self) -> Router {
-        use axum::{
-            Router,
-            routing::get,
-        };
+        use axum::{Router, routing::get};
         use axum_base::api::{api_hello, health_check};
         use axum_base::web::handler_404;
-        
+
         // Create a simplified router for testing that doesn't require templates
         // API endpoints should only return JSON, not HTML
         Router::new()
@@ -110,9 +106,9 @@ impl TestDatabase {
 
 /// Test helper to verify JSON response structure
 pub fn assert_json_response_structure(body: &str, expected_fields: &[&str]) {
-    let json: serde_json::Value = serde_json::from_str(body)
-        .expect("Response should be valid JSON");
-    
+    let json: serde_json::Value =
+        serde_json::from_str(body).expect("Response should be valid JSON");
+
     for field in expected_fields {
         assert!(
             json.get(field).is_some(),

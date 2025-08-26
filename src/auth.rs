@@ -3,8 +3,8 @@
 //! Handles password hashing, session management, and user authentication.
 
 use argon2::{
-    password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
+    password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
 };
 use chrono::Utc;
 use sqlx::PgPool;
@@ -74,7 +74,7 @@ impl AuthService {
                         // Update last login time
                         let now = Utc::now();
                         sqlx::query(
-                            "UPDATE users SET last_login = $1, updated_at = $1 WHERE id = $2"
+                            "UPDATE users SET last_login = $1, updated_at = $1 WHERE id = $2",
                         )
                         .bind(now)
                         .bind(user.id)
@@ -84,7 +84,7 @@ impl AuthService {
                         Ok(Some(user.into()))
                     }
                     Ok(false) => Ok(None), // Wrong password
-                    Err(_) => Ok(None), // Hash verification error
+                    Err(_) => Ok(None),    // Hash verification error
                 }
             } else {
                 Ok(None) // No password set
@@ -104,14 +104,13 @@ impl AuthService {
             .map_err(|e| format!("Password hashing error: {}", e))?;
         let now = Utc::now();
 
-        let result = sqlx::query(
-            "UPDATE users SET password_hash = $1, updated_at = $2 WHERE id = $3"
-        )
-        .bind(password_hash)
-        .bind(now)
-        .bind(user_id)
-        .execute(pool)
-        .await?;
+        let result =
+            sqlx::query("UPDATE users SET password_hash = $1, updated_at = $2 WHERE id = $3")
+                .bind(password_hash)
+                .bind(now)
+                .bind(user_id)
+                .execute(pool)
+                .await?;
 
         if result.rows_affected() == 0 {
             return Err(format!("User with ID {} not found", user_id).into());
@@ -137,18 +136,19 @@ impl AuthService {
         .fetch_optional(pool)
         .await?;
 
-        if let Some(user) = user {
-            if let Some(current_hash) = &user.password_hash {
+        if let Some(user) = user
+            && let Some(current_hash) = &user.password_hash {
                 // Verify current password
                 if PasswordService::verify_password(current_password, current_hash)
-                    .map_err(|e| format!("Password verification error: {}", e))? {
+                    .map_err(|e| format!("Password verification error: {}", e))?
+                {
                     // Hash new password and update
                     let new_hash = PasswordService::hash_password(new_password)
                         .map_err(|e| format!("Password hashing error: {}", e))?;
                     let now = Utc::now();
 
                     sqlx::query(
-                        "UPDATE users SET password_hash = $1, updated_at = $2 WHERE id = $3"
+                        "UPDATE users SET password_hash = $1, updated_at = $2 WHERE id = $3",
                     )
                     .bind(new_hash)
                     .bind(now)
@@ -159,7 +159,6 @@ impl AuthService {
                     return Ok(true);
                 }
             }
-        }
 
         Ok(false)
     }
@@ -172,7 +171,7 @@ impl AuthService {
     ) -> Result<bool, sqlx::Error> {
         let now = Utc::now();
         let result = sqlx::query(
-            "UPDATE users SET email = $1, updated_at = $2 WHERE id = $3 AND is_active = true"
+            "UPDATE users SET email = $1, updated_at = $2 WHERE id = $3 AND is_active = true",
         )
         .bind(email)
         .bind(now)
@@ -191,8 +190,10 @@ impl AuthService {
         password: Option<&str>,
     ) -> Result<User, Box<dyn std::error::Error + Send + Sync>> {
         let password_hash = if let Some(pwd) = password {
-            Some(PasswordService::hash_password(pwd)
-                .map_err(|e| format!("Password hashing error: {}", e))?)
+            Some(
+                PasswordService::hash_password(pwd)
+                    .map_err(|e| format!("Password hashing error: {}", e))?,
+            )
         } else {
             None
         };
@@ -228,7 +229,11 @@ use tower_sessions::Session;
 
 /// Middleware to require authentication
 #[allow(dead_code)]
-pub async fn require_auth(session: Session, request: Request, next: Next) -> Result<Response, Redirect> {
+pub async fn require_auth(
+    session: Session,
+    request: Request,
+    next: Next,
+) -> Result<Response, Redirect> {
     // Check if user is authenticated
     match session.get::<AuthenticatedUser>(USER_SESSION_KEY).await {
         Ok(Some(_user)) => {
@@ -249,7 +254,7 @@ pub async fn inject_user(session: Session, mut request: Request, next: Next) -> 
     if let Ok(Some(user)) = session.get::<AuthenticatedUser>(USER_SESSION_KEY).await {
         request.extensions_mut().insert(user);
     }
-    
+
     next.run(request).await
 }
 

@@ -19,6 +19,6 @@ use server::start_server;
 async fn main() {
     // Load environment variables from .env file
     dotenvy::dotenv().ok();
-    
+
     start_server().await;
 }

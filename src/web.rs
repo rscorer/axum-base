@@ -7,12 +7,12 @@ use axum::{
     http::{StatusCode, Uri},
     response::{Html, Json, Redirect},
 };
-use chrono::{DateTime, Utc, Datelike, Timelike};
+use chrono::{DateTime, Datelike, Timelike, Utc};
 use serde_json::json;
 use sqlx::PgPool;
 use std::collections::HashMap;
-use tera::{Tera, Context};
 use std::sync::OnceLock;
+use tera::{Context, Tera};
 use tower_sessions::Session;
 
 use crate::auth::{AuthService, USER_SESSION_KEY};
@@ -24,9 +24,9 @@ static TEMPLATES: OnceLock<Tera> = OnceLock::new();
 /// Initialize the template engine
 pub fn init_templates() -> Result<(), tera::Error> {
     let tera = Tera::new("templates/**/*")?;
-    TEMPLATES.set(tera).map_err(|_| {
-        tera::Error::msg("Failed to initialize template engine")
-    })?;
+    TEMPLATES
+        .set(tera)
+        .map_err(|_| tera::Error::msg("Failed to initialize template engine"))?;
     Ok(())
 }
 
@@ -54,7 +54,7 @@ fn format_human_time(dt: DateTime<Utc>) -> String {
         12 => "Dec",
         _ => "Unknown",
     };
-    
+
     let day = dt.day();
     let day_suffix = match day % 10 {
         1 if day != 11 => "st",
@@ -62,7 +62,7 @@ fn format_human_time(dt: DateTime<Utc>) -> String {
         3 if day != 13 => "rd",
         _ => "th",
     };
-    
+
     let hour = dt.hour();
     let (hour_12, am_pm) = if hour == 0 {
         (12, "am")
@@ -73,7 +73,7 @@ fn format_human_time(dt: DateTime<Utc>) -> String {
     } else {
         (hour - 12, "pm")
     };
-    
+
     format!(
         "{} {}{}, {} @ {}:{:02}{}",
         month,
@@ -90,17 +90,17 @@ fn format_human_time(dt: DateTime<Utc>) -> String {
 /// Pass additional variables as a HashMap
 fn create_base_context(additional_vars: HashMap<&str, serde_json::Value>) -> Context {
     let mut context = Context::new();
-    
+
     // Add common variables that appear in all templates
     context.insert("service_name", "Axum Base");
     context.insert("version", env!("CARGO_PKG_VERSION"));
     context.insert("server_time", &format_human_time(Utc::now()));
-    
+
     // Add any additional variables passed in
     for (key, value) in additional_vars {
         context.insert(key, &value);
     }
-    
+
     context
 }
 
@@ -110,36 +110,38 @@ fn create_base_context_with_user(
     user: Option<&AuthenticatedUser>,
 ) -> Context {
     let mut context = Context::new();
-    
+
     // Add common variables that appear in all templates
     context.insert("service_name", "Axum Base");
     context.insert("version", env!("CARGO_PKG_VERSION"));
     context.insert("server_time", &format_human_time(Utc::now()));
-    
+
     // Add user information if available
     context.insert("current_user", &user);
     context.insert("is_authenticated", &user.is_some());
-    
+
     // Add any additional variables passed in
     for (key, value) in additional_vars {
         context.insert(key, &value);
     }
-    
+
     context
 }
 
 /// Render a template with error handling
-fn render_template(template_name: &str, context: &Context) -> Result<Html<String>, (StatusCode, String)> {
+fn render_template(
+    template_name: &str,
+    context: &Context,
+) -> Result<Html<String>, (StatusCode, String)> {
     let tera = get_templates();
-    let rendered = tera.render(template_name, context)
-        .map_err(|err| {
-            eprintln!("Failed to render template '{}': {}", template_name, err);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to render {}", template_name),
-            )
-        })?;
-    
+    let rendered = tera.render(template_name, context).map_err(|err| {
+        eprintln!("Failed to render template '{}': {}", template_name, err);
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Failed to render {}", template_name),
+        )
+    })?;
+
     Ok(Html(rendered))
 }
 
@@ -166,13 +168,13 @@ pub async fn serve_landing(session: Session) -> Result<Html<String>, (StatusCode
             "link": "/health"
         }
     ]);
-    
+
     // Create context with base variables plus page-specific data
     let mut page_vars = HashMap::new();
     page_vars.insert("page_title", json!("Modern Rust Web Application Template"));
     page_vars.insert("page_description", json!("A production-ready foundation for building fast, secure web applications with Rust and Axum."));
     page_vars.insert("landing_features", landing_features);
-    
+
     let current_user = get_current_user(&session).await;
     let context = create_base_context_with_user(page_vars, current_user.as_ref());
     render_template("landing.html", &context)
@@ -203,19 +205,22 @@ pub async fn serve_index(session: Session) -> Result<Html<String>, (StatusCode, 
             "description": "Dynamic content with Tera template engine"
         }
     ]);
-    
+
     let endpoints = json!([
         {"name": "Try API", "path": "/api/hello"},
         {"name": "Health Check", "path": "/health"}
     ]);
-    
+
     // Create context with base variables plus page-specific data
     let mut page_vars = HashMap::new();
     page_vars.insert("title", json!("Home"));
-    page_vars.insert("description", json!("A fast and modern Rust web application template built with Axum"));
+    page_vars.insert(
+        "description",
+        json!("A fast and modern Rust web application template built with Axum"),
+    );
     page_vars.insert("features", features);
     page_vars.insert("endpoints", endpoints);
-    
+
     let current_user = get_current_user(&session).await;
     let context = create_base_context_with_user(page_vars, current_user.as_ref());
     render_template("index.html", &context)
@@ -240,9 +245,9 @@ pub async fn serve_login(session: Session) -> Result<Html<String>, Redirect> {
     let mut page_vars = HashMap::new();
     page_vars.insert("title", json!("Login"));
     page_vars.insert("error", json!(null));
-    
+
     let context = create_base_context(page_vars);
-    
+
     match render_template("login.html", &context) {
         Ok(html) => Ok(html),
         Err(_) => Err(Redirect::to("/")),
@@ -259,16 +264,17 @@ pub async fn handle_login(
     match AuthService::authenticate_user(&pool, &login_data.username, &login_data.password).await {
         Ok(Some(user)) => {
             // Store user in session
-            if let Err(_) = session.insert(USER_SESSION_KEY, &user).await {
+            if (session.insert(USER_SESSION_KEY, &user).await).is_err() {
                 let mut page_vars = HashMap::new();
                 page_vars.insert("title", json!("Login"));
                 page_vars.insert("error", json!("Session error. Please try again."));
                 page_vars.insert("username", json!(login_data.username));
-                
+
                 let context = create_base_context(page_vars);
-                return Err(render_template("login.html", &context).unwrap_or_else(|_| Html("Login error".to_string())));
+                return Err(render_template("login.html", &context)
+                    .unwrap_or_else(|_| Html("Login error".to_string())));
             }
-            
+
             Ok(Redirect::to("/"))
         }
         Ok(None) => {
@@ -277,9 +283,10 @@ pub async fn handle_login(
             page_vars.insert("title", json!("Login"));
             page_vars.insert("error", json!("Invalid username or password"));
             page_vars.insert("username", json!(login_data.username));
-            
+
             let context = create_base_context(page_vars);
-            Err(render_template("login.html", &context).unwrap_or_else(|_| Html("Login error".to_string())))
+            Err(render_template("login.html", &context)
+                .unwrap_or_else(|_| Html("Login error".to_string())))
         }
         Err(_) => {
             // Database error
@@ -287,9 +294,10 @@ pub async fn handle_login(
             page_vars.insert("title", json!("Login"));
             page_vars.insert("error", json!("System error. Please try again later."));
             page_vars.insert("username", json!(login_data.username));
-            
+
             let context = create_base_context(page_vars);
-            Err(render_template("login.html", &context).unwrap_or_else(|_| Html("Login error".to_string())))
+            Err(render_template("login.html", &context)
+                .unwrap_or_else(|_| Html("Login error".to_string())))
         }
     }
 }
@@ -300,7 +308,7 @@ pub async fn handle_logout(session: Session) -> Redirect {
     let _ = session.remove::<AuthenticatedUser>(USER_SESSION_KEY).await;
     // Clear the entire session
     let _ = session.clear().await;
-    
+
     Redirect::to("/login")
 }
 
@@ -317,9 +325,9 @@ pub async fn serve_profile(session: Session) -> Result<Html<String>, Redirect> {
     page_vars.insert("user", json!(user));
     page_vars.insert("success", json!(null));
     page_vars.insert("error", json!(null));
-    
+
     let context = create_base_context_with_user(page_vars, Some(&user));
-    
+
     match render_template("profile.html", &context) {
         Ok(html) => Ok(html),
         Err(_) => Err(Redirect::to("/")),
@@ -345,8 +353,8 @@ pub async fn handle_profile_update(
     if let (Some(email), Some(action)) = (
         form_data.get("email").and_then(|v| v.as_str()),
         form_data.get("action").and_then(|v| v.as_str()),
-    ) {
-        if action == "update_profile" {
+    )
+        && action == "update_profile" {
             match AuthService::update_user_profile(&pool, user.id, email).await {
                 Ok(true) => {
                     success_message = Some("Profile updated successfully!".to_string());
@@ -359,43 +367,45 @@ pub async fn handle_profile_update(
                 Err(_) => error_message = Some("Database error".to_string()),
             }
         }
-    }
 
     // Handle password change
-    if let (
-        Some(current_password),
-        Some(new_password),
-        Some(confirm_password),
-        Some(action),
-    ) = (
+    if let (Some(current_password), Some(new_password), Some(confirm_password), Some(action)) = (
         form_data.get("current_password").and_then(|v| v.as_str()),
         form_data.get("new_password").and_then(|v| v.as_str()),
         form_data.get("confirm_password").and_then(|v| v.as_str()),
         form_data.get("action").and_then(|v| v.as_str()),
-    ) {
-        if action == "change_password" {
+    )
+        && action == "change_password" {
             if new_password != confirm_password {
                 error_message = Some("New passwords do not match".to_string());
             } else if new_password.len() < 8 {
                 error_message = Some("Password must be at least 8 characters".to_string());
             } else {
-                match AuthService::change_user_password(&pool, user.id, current_password, new_password).await {
-                    Ok(true) => success_message = Some("Password changed successfully!".to_string()),
+                match AuthService::change_user_password(
+                    &pool,
+                    user.id,
+                    current_password,
+                    new_password,
+                )
+                .await
+                {
+                    Ok(true) => {
+                        success_message = Some("Password changed successfully!".to_string())
+                    }
                     Ok(false) => error_message = Some("Current password is incorrect".to_string()),
                     Err(_) => error_message = Some("Error changing password".to_string()),
                 }
             }
         }
-    }
 
     let mut page_vars = HashMap::new();
     page_vars.insert("title", json!("Profile"));
     page_vars.insert("user", json!(user));
     page_vars.insert("success", json!(success_message));
     page_vars.insert("error", json!(error_message));
-    
+
     let context = create_base_context_with_user(page_vars, Some(&user));
-    
+
     match render_template("profile.html", &context) {
         Ok(html) => Ok(html),
         Err(_) => Err(Redirect::to("/")),
