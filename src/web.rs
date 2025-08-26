@@ -353,20 +353,20 @@ pub async fn handle_profile_update(
     if let (Some(email), Some(action)) = (
         form_data.get("email").and_then(|v| v.as_str()),
         form_data.get("action").and_then(|v| v.as_str()),
-    )
-        && action == "update_profile" {
-            match AuthService::update_user_profile(&pool, user.id, email).await {
-                Ok(true) => {
-                    success_message = Some("Profile updated successfully!".to_string());
-                    // Update session with new email
-                    let mut updated_user = user.clone();
-                    updated_user.email = email.to_string();
-                    let _ = session.insert(USER_SESSION_KEY, &updated_user).await;
-                }
-                Ok(false) => error_message = Some("Failed to update profile".to_string()),
-                Err(_) => error_message = Some("Database error".to_string()),
+    ) && action == "update_profile"
+    {
+        match AuthService::update_user_profile(&pool, user.id, email).await {
+            Ok(true) => {
+                success_message = Some("Profile updated successfully!".to_string());
+                // Update session with new email
+                let mut updated_user = user.clone();
+                updated_user.email = email.to_string();
+                let _ = session.insert(USER_SESSION_KEY, &updated_user).await;
             }
+            Ok(false) => error_message = Some("Failed to update profile".to_string()),
+            Err(_) => error_message = Some("Database error".to_string()),
         }
+    }
 
     // Handle password change
     if let (Some(current_password), Some(new_password), Some(confirm_password), Some(action)) = (
@@ -374,29 +374,22 @@ pub async fn handle_profile_update(
         form_data.get("new_password").and_then(|v| v.as_str()),
         form_data.get("confirm_password").and_then(|v| v.as_str()),
         form_data.get("action").and_then(|v| v.as_str()),
-    )
-        && action == "change_password" {
-            if new_password != confirm_password {
-                error_message = Some("New passwords do not match".to_string());
-            } else if new_password.len() < 8 {
-                error_message = Some("Password must be at least 8 characters".to_string());
-            } else {
-                match AuthService::change_user_password(
-                    &pool,
-                    user.id,
-                    current_password,
-                    new_password,
-                )
+    ) && action == "change_password"
+    {
+        if new_password != confirm_password {
+            error_message = Some("New passwords do not match".to_string());
+        } else if new_password.len() < 8 {
+            error_message = Some("Password must be at least 8 characters".to_string());
+        } else {
+            match AuthService::change_user_password(&pool, user.id, current_password, new_password)
                 .await
-                {
-                    Ok(true) => {
-                        success_message = Some("Password changed successfully!".to_string())
-                    }
-                    Ok(false) => error_message = Some("Current password is incorrect".to_string()),
-                    Err(_) => error_message = Some("Error changing password".to_string()),
-                }
+            {
+                Ok(true) => success_message = Some("Password changed successfully!".to_string()),
+                Ok(false) => error_message = Some("Current password is incorrect".to_string()),
+                Err(_) => error_message = Some("Error changing password".to_string()),
             }
         }
+    }
 
     let mut page_vars = HashMap::new();
     page_vars.insert("title", json!("Profile"));

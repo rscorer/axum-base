@@ -137,28 +137,27 @@ impl AuthService {
         .await?;
 
         if let Some(user) = user
-            && let Some(current_hash) = &user.password_hash {
-                // Verify current password
-                if PasswordService::verify_password(current_password, current_hash)
-                    .map_err(|e| format!("Password verification error: {}", e))?
-                {
-                    // Hash new password and update
-                    let new_hash = PasswordService::hash_password(new_password)
-                        .map_err(|e| format!("Password hashing error: {}", e))?;
-                    let now = Utc::now();
+            && let Some(current_hash) = &user.password_hash
+        {
+            // Verify current password
+            if PasswordService::verify_password(current_password, current_hash)
+                .map_err(|e| format!("Password verification error: {}", e))?
+            {
+                // Hash new password and update
+                let new_hash = PasswordService::hash_password(new_password)
+                    .map_err(|e| format!("Password hashing error: {}", e))?;
+                let now = Utc::now();
 
-                    sqlx::query(
-                        "UPDATE users SET password_hash = $1, updated_at = $2 WHERE id = $3",
-                    )
+                sqlx::query("UPDATE users SET password_hash = $1, updated_at = $2 WHERE id = $3")
                     .bind(new_hash)
                     .bind(now)
                     .bind(user_id)
                     .execute(pool)
                     .await?;
 
-                    return Ok(true);
-                }
+                return Ok(true);
             }
+        }
 
         Ok(false)
     }
