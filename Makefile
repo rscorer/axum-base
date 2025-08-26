@@ -1,6 +1,14 @@
-.PHONY: test test-api test-cli test-all check tailwind-dev tailwind-build
+.PHONY: run watch test test-api test-cli test-all check clean-test tailwind-dev tailwind-build fmt clippy create-user set-password sqlx-prepare dev-setup clean dev
 
-# Run all tests single-threaded (default target)
+# Run the application (default target)
+run:
+	cargo run
+
+# Run with auto-reload on file changes
+watch:
+	cargo watch -x run
+
+# Run all tests single-threaded
 test:
 	cargo test -- --test-threads=1
 
@@ -31,3 +39,38 @@ tailwind-dev:
 # Tailwind CSS production build
 tailwind-build:
 	./tw-build.sh
+
+# Code formatting
+fmt:
+	cargo fmt
+
+# Code linting
+clippy:
+	cargo clippy
+
+# Database operations
+create-user:
+	cargo run --bin create_user
+
+set-password:
+	cargo run --bin set_password
+
+# SQLx operations
+sqlx-prepare:
+	cargo sqlx prepare
+
+# Development setup (build deps + tailwind)
+dev-setup: 
+	cargo build
+	./tw-build.sh
+
+# Clean everything
+clean:
+	cargo clean
+	rm -f static/style.css
+
+# Full development workflow
+dev: dev-setup
+	@echo "🚀 Starting development servers..."
+	@echo "📝 Run 'make tailwind-dev' in another terminal for CSS watching"
+	make watch
