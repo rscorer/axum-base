@@ -1,4 +1,4 @@
-.PHONY: test test-api test-cli test-all check
+.PHONY: test test-api test-cli test-all check tailwind-dev tailwind-build
 
 # Run all tests single-threaded (default target)
 test:
@@ -23,3 +23,11 @@ check:
 # Clean and test
 clean-test:
 	cargo clean && make test
+
+# Tailwind CSS development (watch mode)
+tailwind-dev:
+	./tw.sh
+
+# Tailwind CSS production build
+tailwind-build:
+	./tw-build.sh

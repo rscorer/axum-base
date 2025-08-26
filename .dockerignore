@@ -1,0 +1,103 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+*.pdb
+
+# Cargo files (we copy Cargo.toml and Cargo.lock explicitly)
+Cargo.lock
+.cargo/
+
+# Development environment files
+.env*
+!.env.example
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (not needed in container)
+README.md
+AI-ROBOT-FRIENDS.md
+LICENSE
+docs/
+
+# AI configuration files (not needed in container)
+.ai-context.md
+.claude.md
+.gemini.md
+.jetbrains-ai.md
+.windsurf.md
+.warp.md
+.cursorrules
+.continuerc.json
+.aider.conf.yml
+.copilotignore
+
+# Development scripts (not needed in container)
+tw.sh
+tw-build.sh
+
+# Test files (not needed in production container)
+tests/
+
+# Generated CSS (will be built inside container)
+static/style.css
+
+# Logs
+*.log
+logs/
+
+# Database files (should be external)
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Rust specific
+**/*.rs.bk
+*.orig
+
+# Docker files (to avoid recursive copying)
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+compose.yml
+
+# Build and deployment files
+Makefile
+
+# Node modules (if any were added locally)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Coverage reports
+tarpaulin-report.html
+coverage/
+
+# Backup files
+*.bak
+*.backup
