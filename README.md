@@ -156,38 +156,59 @@ compose.yml          # 📋 Docker Compose orchestration
 
 ## 🛠️ Development Commands
 
+### Quick Start
 ```bash
-# Development server with auto-reload
+# Full development workflow (builds deps + starts server)
+make dev
+
+# Or step by step:
+make run                    # Start the application
+make watch                  # Start with auto-reload on file changes
+```
+
+### Makefile Commands
+```bash
+# Development
+make run                    # Run the application
+make watch                  # Run with auto-reload (cargo watch)
+make dev                    # Full development setup + watch
+make dev-setup              # Build dependencies + Tailwind CSS
+
+# Tailwind CSS
+make tailwind-dev           # Development mode (watch)
+make tailwind-build         # Production build (minified)
+
+# Testing
+make test                   # Run all tests
+make test-api               # Run API integration tests
+make test-cli               # Run CLI utility tests  
+make test-all               # Run tests with output
+make check                  # Quick compile check
+make clean-test             # Clean + test
+
+# Code Quality
+make fmt                    # Format code with rustfmt
+make clippy                 # Lint code with clippy
+make sqlx-prepare           # Check SQLx queries
+
+# Database Operations
+make create-user            # Create new user via CLI
+make set-password           # Set user password via CLI
+
+# Utilities
+make clean                  # Clean build artifacts + CSS
+```
+
+### Direct Cargo Commands
+```bash
+# Alternative to Makefile (if preferred)
+cargo run
 cargo watch -x run
-
-# Tailwind CSS development (watch mode) - run in separate terminal
-./tw.sh
-# OR use Makefile
-make tailwind-dev
-
-# Tailwind CSS production build
-./tw-build.sh
-# OR use Makefile
-make tailwind-build
-
-# Run all tests
 cargo test
-
-# Run specific test suite
-cargo test --test api_tests
-
-# Format code
 cargo fmt
-
-# Lint code
 cargo clippy
-
-# Check SQLx queries against database
-cargo sqlx prepare
-
-# Database operations
-cargo run --bin create_user
-cargo run --bin set_password
+./tw.sh                     # Tailwind development
+./tw-build.sh               # Tailwind production
 ```
 
 ## 🎨 Tailwind CSS Integration
