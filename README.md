@@ -276,10 +276,20 @@ SESSION_SECRET=your-secret-key-here
 
 ## 🧪 Testing
 
+### 🏃‍♂️ Selective Test Threading
+This project uses an **optimized testing strategy** with selective threading for maximum performance while maintaining reliability:
+
+- **Unit Tests** (in `src/models.rs`): Run in **parallel** for fast execution
+- **Database Tests** (in `tests/`): Run **serially** with `#[serial]` to prevent race conditions
+- **Performance**: Best of both worlds - fast unit tests, reliable integration tests
+
 ### Unit Tests
 ```bash
-# Test business logic
+# Test business logic (runs in parallel)
 cargo test --lib
+
+# Test specific module
+cargo test models::tests
 
 # Test with coverage
 cargo test --lib --features coverage
@@ -287,15 +297,39 @@ cargo test --lib --features coverage
 
 ### Integration Tests
 ```bash
-# Test HTTP endpoints
+# Test HTTP endpoints (runs serially with #[serial])
 cargo test --test api_tests
 
-# Test CLI utilities
+# Test CLI utilities (runs serially with #[serial])
 cargo test --test cli_tests
+
+# Run all tests with optimal threading
+cargo test --all
 ```
 
-### Database Tests
-Uses real PostgreSQL with proper setup/teardown for reliable testing.
+### Testing Architecture
+- **Dependencies**: Uses `serial_test` crate for selective serialization
+- **Database Tests**: Real PostgreSQL with proper setup/teardown
+- **Test Isolation**: Each database test cleans up after itself
+- **Performance**: Unit tests run in parallel, database tests run serially
+
+### Writing New Tests
+```rust
+// Unit tests (parallel execution)
+#[test]
+fn test_data_validation() {
+    // Fast, isolated logic tests
+}
+
+// Database/integration tests (serial execution)
+use serial_test::serial;
+
+#[tokio::test]
+#[serial]
+async fn test_database_operation() {
+    // Database tests with proper isolation
+}
+```
 
 ## 🔒 Security Features
 

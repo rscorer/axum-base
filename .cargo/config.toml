@@ -1,3 +1,0 @@
-[test]
-# Run tests single-threaded by default to avoid database race conditions
-jobs = 1

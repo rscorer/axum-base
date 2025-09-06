@@ -151,6 +151,44 @@ aider  # Automatically uses .aider.conf.yml
 # 3. Verify security guidelines are respected
 ```
 
+## 🧪 Testing Methodology for AI Assistants
+
+This project uses **selective test threading** for optimal performance. AI assistants should understand this approach when suggesting or generating tests:
+
+### Testing Architecture
+- **Unit Tests**: Run in parallel for fast execution (no `#[serial]` needed)
+- **Database Tests**: Run serially with `#[serial]` attribute to prevent race conditions
+- **Dependencies**: Uses `serial_test` crate for selective serialization
+
+### When to Use `#[serial]` Attribute
+```rust
+// ✅ Use #[serial] for database/integration tests
+use serial_test::serial;
+
+#[tokio::test]
+#[serial]
+async fn test_user_creation_api() {
+    // Tests that interact with database
+}
+
+// ✅ Do NOT use #[serial] for unit tests
+#[test]
+fn test_data_validation() {
+    // Pure logic tests run in parallel
+}
+```
+
+### AI Guidelines for Test Generation
+1. **Database Tests**: Always include `use serial_test::serial;` and `#[serial]` attribute
+2. **Unit Tests**: No special attributes needed - let them run in parallel
+3. **Test Isolation**: Generate proper setup/teardown for database tests
+4. **Performance**: Prefer unit tests over integration tests when possible
+
+### Test File Patterns
+- `src/models.rs` tests: Unit tests (parallel)
+- `tests/api_tests.rs`: Integration tests (serial)
+- `tests/cli_tests.rs`: CLI tests (serial)
+
 ## 🔒 Security Considerations
 
 All configuration files are designed to:

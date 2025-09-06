@@ -1,11 +1,13 @@
 mod common;
 
 use common::{TestDatabase, setup_test_env};
+use serial_test::serial;
 use sqlx::Row;
 use std::process::Command;
 
 /// Test the create_user CLI binary with non-interactive mode
 #[tokio::test]
+#[serial]
 async fn test_create_user_cli_non_interactive() {
     setup_test_env();
 
@@ -59,6 +61,7 @@ async fn test_create_user_cli_non_interactive() {
 
 /// Test the create_user CLI binary with invalid arguments
 #[tokio::test]
+#[serial]
 async fn test_create_user_cli_invalid_args() {
     setup_test_env();
 
@@ -88,6 +91,7 @@ async fn test_create_user_cli_invalid_args() {
 
 /// Test the create_user CLI binary with empty email
 #[tokio::test]
+#[serial]
 async fn test_create_user_cli_empty_email() {
     setup_test_env();
 
@@ -124,6 +128,7 @@ async fn test_create_user_cli_empty_email() {
 /// Test the create_user CLI binary with interactive mode simulation
 /// Note: We can't easily test true interactive mode, so this tests the logic
 #[tokio::test]
+#[serial]
 async fn test_create_user_requires_password() {
     setup_test_env();
 
@@ -146,6 +151,7 @@ async fn test_create_user_requires_password() {
 
 /// Test the set_password CLI binary with valid arguments
 #[tokio::test]
+#[serial]
 async fn test_set_password_cli_success() {
     setup_test_env();
 
@@ -203,6 +209,7 @@ async fn test_set_password_cli_success() {
 
 /// Test the set_password CLI binary with invalid user ID
 #[tokio::test]
+#[serial]
 async fn test_set_password_cli_invalid_user_id() {
     setup_test_env();
 
@@ -237,6 +244,7 @@ async fn test_set_password_cli_invalid_user_id() {
 
 /// Test the set_password CLI binary with invalid arguments
 #[tokio::test]
+#[serial]
 async fn test_set_password_cli_invalid_args() {
     setup_test_env();
 
@@ -259,6 +267,7 @@ async fn test_set_password_cli_invalid_args() {
 
 /// Test the set_password CLI binary with non-numeric user ID
 #[tokio::test]
+#[serial]
 async fn test_set_password_cli_non_numeric_user_id() {
     setup_test_env();
 
@@ -288,6 +297,7 @@ async fn test_set_password_cli_non_numeric_user_id() {
 
 /// Test the set_password CLI binary with short password
 #[tokio::test]
+#[serial]
 async fn test_set_password_cli_short_password() {
     setup_test_env();
 
@@ -326,6 +336,7 @@ async fn test_set_password_cli_short_password() {
 
 /// Test duplicate username creation
 #[tokio::test]
+#[serial]
 async fn test_create_user_cli_duplicate_username() {
     setup_test_env();
 

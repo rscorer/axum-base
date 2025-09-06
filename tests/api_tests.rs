@@ -1,12 +1,14 @@
 mod common;
 
 use axum::http::StatusCode;
+use serial_test::serial;
 use axum_test::TestServer;
 use chrono;
 use common::{TestDatabase, assert_json_response_structure, setup_test_env};
 
 /// Test that the health endpoint returns expected JSON structure
 #[tokio::test]
+#[serial]
 async fn test_health_endpoint() {
     setup_test_env();
 
@@ -39,6 +41,7 @@ async fn test_health_endpoint() {
 
 /// Test 404 handling for unknown routes
 #[tokio::test]
+#[serial]
 async fn test_404_endpoint() {
     setup_test_env();
 
@@ -71,6 +74,7 @@ async fn test_404_endpoint() {
 
 /// Test the API hello endpoint
 #[tokio::test]
+#[serial]
 async fn test_api_hello_endpoint() {
     setup_test_env();
 
@@ -160,6 +164,7 @@ async fn test_login_page_endpoint() {
 
 /// Test database connection in test environment
 #[tokio::test]
+#[serial]
 async fn test_database_connection() {
     setup_test_env();
 
@@ -178,6 +183,7 @@ async fn test_database_connection() {
 
 /// Test user creation and cleanup
 #[tokio::test]
+#[serial]
 async fn test_user_creation() {
     setup_test_env();
 
