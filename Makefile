@@ -8,21 +8,21 @@ run:
 watch:
 	cargo watch -x run
 
-# Run all tests single-threaded
+# Run all tests with selective threading optimization
 test:
-	cargo test -- --test-threads=1
+	cargo test
 
-# Run only API tests
+# Run only API tests (database tests run serially via #[serial])
 test-api:
-	cargo test --test api_tests -- --test-threads=1
+	cargo test --test api_tests
 
-# Run only CLI tests  
+# Run only CLI tests (database tests run serially via #[serial])
 test-cli:
-	cargo test --test cli_tests -- --test-threads=1
+	cargo test --test cli_tests
 
 # Run all tests with output
 test-all:
-	cargo test -- --test-threads=1 --nocapture
+	cargo test --nocapture
 
 # Quick compile check
 check:
