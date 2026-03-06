@@ -1,5 +1,5 @@
 # Multi-stage build for Axum Base with Tailwind CSS
-FROM rust:1.89-bookworm as rust-builder
+FROM rust:1.94-bookworm as rust-builder
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
