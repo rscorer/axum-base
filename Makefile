@@ -32,14 +32,6 @@ check:
 clean-test:
 	cargo clean && make test
 
-# Tailwind CSS development (watch mode)
-tailwind-dev:
-	./tw.sh
-
-# Tailwind CSS production build
-tailwind-build:
-	./tw-build.sh
-
 # Code formatting
 fmt:
 	cargo fmt
@@ -62,7 +54,6 @@ sqlx-prepare:
 # Development setup (build deps + tailwind)
 dev-setup: 
 	cargo build
-	./tw-build.sh
 
 # Clean everything
 clean:

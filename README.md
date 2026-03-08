@@ -87,11 +87,6 @@ cp .env.example .env
 # Install dependencies
 cargo build
 
-# Build Tailwind CSS for development (run in separate terminal)
-./tw.sh
-
-# OR build Tailwind CSS once for production
-./tw-build.sh
 ```
 
 ### 4. Run Application
@@ -146,8 +141,6 @@ static/              # 📦 Static assets (CSS, JS, images)
 ├── style.css        #   Generated CSS from Tailwind (served to browsers)
 
 input.css            # 🎨 Tailwind CSS source (@import "tailwindcss")
-tw.sh                # ⚡ Development Tailwind build (--watch)
-tw-build.sh          # 🚀 Production Tailwind build (--minify)
 
 Dockerfile           # 🐳 Multi-stage Docker build configuration
 .dockerignore        # 🚫 Docker build context exclusions
@@ -207,8 +200,6 @@ cargo watch -x run
 cargo test
 cargo fmt
 cargo clippy
-./tw.sh                     # Tailwind development
-./tw-build.sh               # Tailwind production
 ```
 
 ## 🎨 Tailwind CSS Integration
@@ -222,32 +213,23 @@ This project uses **Tailwind CSS** for styling, with a streamlined build process
 
 ### ⚡ Development Workflow
 ```bash
-# Start Tailwind in watch mode (monitors file changes)
-./tw.sh
-
-# In a separate terminal, start your Axum server
+# Start your Axum server
 cargo run
 ```
 
 ### 🚀 Production Build
 ```bash
-# One-time build with minification for production
-./tw-build.sh
-
-# OR use Makefile
-make tailwind-build
+# use Makefile
+make build
 ```
 
 ### 📁 File Structure
 ```
 input.css          # Tailwind source (imports @tailwindcss)
 static/style.css   # Generated CSS (served by Axum)
-tw.sh             # Development script (--watch)
-tw-build.sh       # Production script (--minify)
 ```
 
 ### 💡 Usage Tips
-- Run `./tw.sh` in a **separate terminal** for development
 - The build process **automatically detects** class usage in templates
 - Production builds are **minified** for optimal performance
 - All Tailwind classes in templates are **purged** if unused

@@ -1,0 +1,104 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT \n                i.id, i.title, i.description, i.data, i.is_active, i.category_id, \n                i.created_at, i.updated_at,\n                c.id as cat_id, c.category_name, c.display_name, c.is_visible,\n                c.display_order, c.created_at as cat_created_at, c.updated_at as cat_updated_at\n             FROM items i \n             JOIN category c ON i.category_id = c.id \n             WHERE c.is_visible = true AND i.is_active = true\n             ORDER BY i.created_at DESC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "data",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 4,
+        "name": "is_active",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "category_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "cat_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "category_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "display_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "is_visible",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 12,
+        "name": "display_order",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "cat_created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "cat_updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "4d002a4780a3f30651c24d398875eb378ff6ba153d7cdc268ffc0b56c5b04f1e"
+}

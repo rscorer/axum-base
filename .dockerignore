@@ -4,7 +4,6 @@
 *.pdb
 
 # Cargo files (we copy Cargo.toml and Cargo.lock explicitly)
-Cargo.lock
 .cargo/
 
 # Development environment files
@@ -43,10 +42,6 @@ docs/
 .aider.conf.yml
 .copilotignore
 
-# Development scripts (not needed in container)
-tw.sh
-tw-build.sh
-
 # Test files (not needed in production container)
 tests/
 
@@ -61,6 +56,8 @@ logs/
 *.db
 *.sqlite
 *.sqlite3
+!.sqlx/
+!sqlx-data.json
 
 # Temporary files
 tmp/
