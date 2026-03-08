@@ -14,7 +14,7 @@ async fn test_health_endpoint() {
 
     let test_db = TestDatabase::new().await;
     let app = test_db.create_test_app().await;
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server.get("/health").await;
     response.assert_status(StatusCode::OK);
@@ -47,7 +47,7 @@ async fn test_404_endpoint() {
 
     let test_db = TestDatabase::new().await;
     let app = test_db.create_test_app().await;
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server.get("/nonexistent").await;
     response.assert_status(StatusCode::NOT_FOUND);
@@ -80,7 +80,7 @@ async fn test_api_hello_endpoint() {
 
     let test_db = TestDatabase::new().await;
     let app = test_db.create_test_app().await;
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server.get("/api/hello").await;
     response.assert_status(StatusCode::OK);

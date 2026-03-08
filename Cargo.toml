@@ -31,18 +31,19 @@ dotenvy = "0.15"
 uuid = { version = "1.0", features = ["v4", "serde"] }
 # Authentication dependencies
 argon2 = "0.5"
-tower-sessions = "0.14"
-tower-sessions-sqlx-store = { version = "0.15", features = ["postgres"] }
-axum-extra = { version = "0.10", features = ["form"] }
+tower-sessions = "0.15.0"
+tower-sessions-sqlx-store = { version = "0.15", features = ["postgres"], git = "https://github.com/maxcountryman/tower-sessions-stores.git" }
+axum-extra = { version = "0.12", features = ["form"] }
 
 [dev-dependencies]
 # Testing dependencies
 tokio-test = "0.4"
 hyper = "1.0"
 tower = { version = "0.5", features = ["util"] }
-axum-test = "18.0"
+axum-test = "19"
 serde_json = "1.0"
 # HTTP client for integration tests
-reqwest = { version = "0.12", features = ["json"] }
+reqwest = { version = "0.13", features = ["json"] }
 # Serialize database tests to avoid race conditions
 serial_test = "3.0"
+
